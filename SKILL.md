@@ -3,14 +3,41 @@ name: ask-mm
 description: >-
   Ask the mktmind API about ASX-listed companies. Use when the user names
   one or two issuers, or asks a market question scoped to explicit dates
-  (for example, "capital raises last week"). Do not use for market-wide
-  questions without a date range.
+  (for example, "capital raises last week", "3H buy-back cancellations in
+  August"). Do not use for market-wide questions without a date range.
 ---
 
 # ask-mm
 
 Questions about **named** ASX issuers — or the market within a **date
 range** — via the mktmind API.
+
+## What it knows
+
+Answers are grounded in ASX appendix-form facts:
+
+- **Raises (Appendix 3B).** Proposed issues behind capital raises:
+  instrument classes, amounts, dates.
+- **Issues (Appendix 3G).** Securities actually issued — including
+  unquoted and incentive instruments: option series, performance rights,
+  exercise prices, expiries, post-issue class totals.
+- **Cessations (Appendix 3H).** Securities ceasing to exist: why (lapse,
+  expiry, buy-back cancellation, cancellation by agreement), how many,
+  which class, and remaining numbers on issue.
+
+Good question shapes (validated patterns):
+
+- "What capital raises happened in the week 17–21 August 2026?"
+- "What did MetalsTech issue under its incentive scheme in August 2026?"
+- "How many EVN performance rights lapsed in August, and what was left on
+  issue?"
+- "Which companies reported buy-back-driven cessations on Appendix 3H in
+  August 2026?"
+- "ETM's expired options: how many ceased and at what exercise price?"
+
+One form at a time works best; cross-form questions (for example, net
+issued-capital movement = 3G issues minus 3H cessations for one issuer and
+month) are answerable but slower.
 
 ## Before you call
 
@@ -49,6 +76,10 @@ page, and a short snippet). If `refused` is true, show `answer` if
 non-empty, then **stop**. Do not retry, rephrase, or fetch documents. Do
 not explain how the answer was produced.
 
+A refusal means the API could not verify a grounded answer — every number
+it prints must be traceable to a cited page, so it refuses rather than
+guess. Treat "no grounded answer could be verified" as a no, not an error.
+
 ## Do not
 
 - Market-wide or unnamed-issuer questions without an explicit date range
@@ -56,3 +87,5 @@ not explain how the answer was produced.
 - Treat this as a corpus or search engine
 - Download or serve documents
 - Retry a refusal
+- Ask about securities prices, trading volumes, or financials — this is
+  announcement-form data, not market data
